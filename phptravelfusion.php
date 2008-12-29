@@ -114,8 +114,51 @@ class phpTravelFusion {
       $xmlresults = $this->submitXML($xmldata,$tfconfig);      
       $results = substr($xmlresults,strpos($xmlresults,"<CommandList>"),10000000);           
       
-      return nl2br(htmlentities(trim(str_replace($tfconfig[TFXMLLOGIN],"XXXXXXX",$results))));      
-      }                       
+      $return_results = $this->xml2array(str_replace($tfconfig[TFXMLLOGIN],"XXXXXXX",$results));      
+      return $return_results;      
+      }
+      
+  function xml2array($data)
+      {
+      $p = xml_parser_create();
+      xml_parser_set_option($p, XML_OPTION_SKIP_WHITE, 1);
+      xml_parse_into_struct($p, $data, &$vals, &$index);
+      xml_parser_free($p);
+      $tree = array();
+      $i = 0;
+      $tree = $this->GetChildren($vals, $i);
+      return $tree;
+      }
+  
+   function GetChildren($vals, &$i)
+      {
+      $children = array();
+      if ($vals[$i]['value']) array_push($children, $vals[$i]['value']);      
+      $prevtag = "";
+      while (++$i < count($vals))
+          {
+          switch ($vals[$i]['type'])
+              {
+              case 'cdata':
+                array_push($children, $vals[$i]['value']);
+                break;
+              case 'complete':
+                $children[ strtolower($vals[$i]['tag']) ] = $vals[$i]['value'];
+                break;              
+              case 'open':
+                $j++;
+                if ($prevtag <> $vals[$i]['tag']) {
+                $j = 0;
+                $prevtag = $vals[$i]['tag'];
+                }
+                $children[ strtolower($vals[$i]['tag']) ][$j] = $this->GetChildren($vals,$i);
+                break;              
+              case 'close':
+                return $children;
+              }
+          }
+      }
+                             
 }
 
 ?>         
