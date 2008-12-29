@@ -9,18 +9,16 @@
  *****************************/
 
 class phpTravelFusion {
-  // Grab the config file with the login info, etc.
-  require_once("config.php");
 
-  function submitXML($xmldata) {
+  function submitXML($xmldata,$tfconfig) {
     $socket = socket_create (AF_INET, SOCK_STREAM, 0);
     if ($socket < 0){
       print "Could not create socket";
       die();
       }
-    if (!@socket_connect ($socket, $address, $service_port)) {}
+    if (!socket_connect ($socket, $tfconfig[TFADDRESS], $tfconfig[TFSERVICEPORT])) {}
       $length = strlen($xmldata);
-      $in = "POST /$url HTTP/1.0\r\nContent-Type: text/xml\r\n" . "HOST:$address\r\nContent-Length: $length\r\n\r\n$xmldata";
+      $in = "POST /$tfconfig[TFURL] HTTP/1.0\r\nContent-Type: text/xml\r\n" . "HOST:$tfconfig[TFADDRESS]\r\nContent-Length: $length\r\n\r\n$xmldata";
       $out = '';
       socket_write($socket, $in, strlen ($in));
   
