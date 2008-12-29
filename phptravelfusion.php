@@ -10,6 +10,7 @@
 
 class phpTravelFusion {
 
+  // Submits the passed $xmldata to the TravelFusion API and returns the response
   function submitXML($xmldata,$tfconfig) {
     $socket = socket_create (AF_INET, SOCK_STREAM, 0);
     if ($socket < 0){
@@ -31,6 +32,7 @@ class phpTravelFusion {
     return $temp;      
     }
 
+  // Generates the XML required for the TravelFusion API to return a routing ID
   function doStartRouting($from,$to,$tleave,$treturn,$mode='Plane',$tfconfig)
       {
       $xmldata="<CommandList>
@@ -72,6 +74,7 @@ class phpTravelFusion {
       return trim($routeid);
       }
 
+  // Checks the status of a routing request.
   function doCheckRouteStatus($route,$tfconfig)
       {
       $vals = "";
@@ -101,6 +104,7 @@ class phpTravelFusion {
       return trim($retval);      
       }
 
+  // Returns an array of the routes when passed a routeid
   function getRoutes($route,$tfconfig)
       {
       $xmldata="<CommandList>
@@ -117,7 +121,8 @@ class phpTravelFusion {
       $return_results = $this->xml2array(str_replace($tfconfig[TFXMLLOGIN],"XXXXXXX",$results));      
       return $return_results;      
       }
-      
+
+  // Converts XML into a PHP array      
   function xml2array($data)
       {
       $p = xml_parser_create();
@@ -129,7 +134,8 @@ class phpTravelFusion {
       $tree = $this->GetChildren($vals, $i);
       return $tree;
       }
-  
+      
+   // A recursive function called by xml2array
    function GetChildren($vals, &$i)
       {
       $children = array();
@@ -147,10 +153,11 @@ class phpTravelFusion {
                 break;              
               case 'open':
                 $j++;
-                if ($prevtag <> $vals[$i]['tag']) {
-                $j = 0;
-                $prevtag = $vals[$i]['tag'];
-                }
+                if ($prevtag <> $vals[$i]['tag']) 
+                    {
+                    $j = 0;
+                    $prevtag = $vals[$i]['tag'];
+                    }
                 $children[ strtolower($vals[$i]['tag']) ][$j] = $this->GetChildren($vals,$i);
                 break;              
               case 'close':

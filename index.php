@@ -77,6 +77,7 @@ if (strlen(trim($_GET[getroutes])) > 0)
     exit();    
     }
 echo "<head>";
+echo "<title>PHPTravelFusion API Example #1</title>";
 ?>
 
 <script type='text/javascript'>
