@@ -122,6 +122,44 @@ class phpTravelFusion {
       return $return_results;      
       }
 
+  // Returns a simple array of prices/routeids from different sites given the results of a getRoutes query
+  function getSimplePricing($routesxml)
+      {
+      $simplepricing = array();
+
+      $sites = $routesxml[checkrouting][0][routerlist][0][router];
+      for ($i=0;$i<sizeof($sites);$i++)
+          {
+          $simplepricing[$i][vendor] = $sites[$i][vendor][0][name];
+          $simplepricing[$i][url] = $sites[$i][vendor][0][url];          
+          $flightgroups = $sites[$i][grouplist][0][group];
+          for ($j=0;$j<sizeof($flightgroups);$j++)
+              {
+              if (sizeof($flightgroups[$j]) > 0)
+                  {
+                  $simplepricing[$i][route][$j][routeid] = $flightgroups[$j][id]; 
+                  $outwardlist = $flightgroups[$j][outwardlist];
+                  $simplepricing[$i][route][$j][price] = $outwardlist[0][outward][0][price][0][amount];
+                  $simplepricing[$i][route][$j][currency] = $outwardlist[0][outward][0][price][0][currency];                                          
+                  }
+              }
+          }
+
+      // Rewrite array to only include vendors that have pricing
+      $simplepricing2 = array();
+      $counter = 0;
+      for ($i=0;$i<sizeof($simplepricing);$i++)
+          {
+          if (sizeof($simplepricing[$i][route]) > 0)
+              {
+              $simplepricing2[$counter] = $simplepricing[$i];
+              $counter++;
+              }          
+          }
+                
+      return $simplepricing2;          
+      }
+
   // Converts XML into a PHP array      
   function xml2array($data)
       {

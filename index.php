@@ -36,40 +36,29 @@ if (strlen(trim($_GET[getroutes])) > 0)
     {    
     $tfapi = new phpTravelFusion();
     $routes = $tfapi->getRoutes($_GET[getroutes],$tfconfig);
-    $sites = $routes[checkrouting][0][routerlist][0][router];
+    $simplepricing = $tfapi->getSimplePricing($routes);
+    
     echo "<table border=1>";
-    for ($i=0;$i<sizeof($sites);$i++)
+    for ($i=0;$i<sizeof($simplepricing);$i++)
         {
         echo "<tr>";
-        echo "<td><a href='". $sites[$i][vendor][0][url] ."'>" . $sites[$i][vendor][0][name] . "</a></td>";
-        echo "<td>";        
-        $flightgroups = $sites[$i][grouplist][0][group];
-        echo "<table border=1>";
-        for ($j=0;$j<sizeof($flightgroups);$j++)
-              {
-              if (sizeof($flightgroups[$j]) > 0)
-                    {
-                    echo "<tr>";
-                    echo "<td>";
-                    echo $flightgroups[$j][id];
-                    echo "</td>";
-                    echo "<td>";
-                    $outwardlist = $flightgroups[$j][outwardlist];
-                    for ($k=0;$k<sizeof($outwardlist);$k++)
-                          {
-                          echo "<table border=1>";
-                          echo "<tr><td>";
-                          echo $outwardlist[$k][outward][0][price][0][amount];
-                          echo " " . $outwardlist[$k][outward][0][price][0][currency];                    
-                          //print_r($outwardlist[$k]);
-                          echo "</td></tr>";
-                          echo "</table>";
-                          }
-                    echo "</td>";              
-                    echo "</tr>";
-                    }
-              }
-        echo "</table>";              
+        echo "<td>";
+        echo "<a href='". $simplepricing[$i][url] ."'>" . $simplepricing[$i][vendor] . "</a>";        
+        echo "</td>";
+        echo "<td>";
+        for ($j=0;$j<sizeof($simplepricing[$i][route]);$j++)
+            {
+            echo "<table border=1>";
+            echo "<tr>";
+            echo "<td>";
+            echo $simplepricing[$i][route][$j][routeid];
+            echo "</td>";
+            echo "<td>";
+            echo $simplepricing[$i][route][$j][price] . " " . $simplepricing[$i][route][$j][currency];
+            echo "</td>";
+            echo "</tr>";
+            echo "</table>";
+            }
         echo "</td>";
         echo "</tr>";
         }
