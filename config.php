@@ -1,4 +1,4 @@
-<?
+<?php
 /*****************************
  * phptravelfusion
  * http://code.google.com/p/phptravelfusion/
