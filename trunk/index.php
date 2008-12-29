@@ -35,8 +35,45 @@ if (strlen(trim($_GET[checkroute])) > 0)
 if (strlen(trim($_GET[getroutes])) > 0)
     {    
     $tfapi = new phpTravelFusion();
-    $status = $tfapi->getRoutes($_GET[getroutes],$tfconfig);
-    echo $status;        
+    $routes = $tfapi->getRoutes($_GET[getroutes],$tfconfig);
+    $sites = $routes[checkrouting][0][routerlist][0][router];
+    echo "<table border=1>";
+    for ($i=0;$i<sizeof($sites);$i++)
+        {
+        echo "<tr>";
+        echo "<td><a href='". $sites[$i][vendor][0][url] ."'>" . $sites[$i][vendor][0][name] . "</a></td>";
+        echo "<td>";        
+        $flightgroups = $sites[$i][grouplist][0][group];
+        echo "<table border=1>";
+        for ($j=0;$j<sizeof($flightgroups);$j++)
+              {
+              if (sizeof($flightgroups[$j]) > 0)
+                    {
+                    echo "<tr>";
+                    echo "<td>";
+                    echo $flightgroups[$j][id];
+                    echo "</td>";
+                    echo "<td>";
+                    $outwardlist = $flightgroups[$j][outwardlist];
+                    for ($k=0;$k<sizeof($outwardlist);$k++)
+                          {
+                          echo "<table border=1>";
+                          echo "<tr><td>";
+                          echo $outwardlist[$k][outward][0][price][0][amount];
+                          echo " " . $outwardlist[$k][outward][0][price][0][currency];                    
+                          //print_r($outwardlist[$k]);
+                          echo "</td></tr>";
+                          echo "</table>";
+                          }
+                    echo "</td>";              
+                    echo "</tr>";
+                    }
+              }
+        echo "</table>";              
+        echo "</td>";
+        echo "</tr>";
+        }
+    echo "</table>";                
     exit();    
     }
 echo "<head>";
@@ -197,8 +234,8 @@ echo "<input type='text' id='tleave' value='". date("m/d/y",time() + 604800) ."'
 echo "Return Date<br>";
 echo "<input type='text' id='treturn' value='". date("m/d/y",time() + 1604800) ."'><br><br>";
 echo "<button onClick='javascript:doSearch()'>Search Fares</button>";
-echo "<input type='text' id='done'>"; 
-echo "<input type='text' id='todo'>";
+echo "<input type='hidden' id='done'>"; 
+echo "<input type='hidden' id='todo'>";
 echo "<hr><b>Status</b><br>";
 echo "<div id='status'></div>";
 echo "<hr><b>Results</b><br>";
