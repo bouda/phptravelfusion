@@ -13,8 +13,15 @@ Requirements
 
 Releases
 --------
-v0.1 - Initial release, minimal but functional for only flight searches.
+v0.1.01 - Major bug fixes (see Change Log)
+v0.1    - Initial release, minimal but functional for only flight searches.
 
+Change Log
+----------
+v0.1.01 * Fixed date translation (mm/dd vs dd/mm) issue
+        * New method to return a simplified list of fares 
+        * Fixed problem where search was returning one-way flights only
+               
 Files
 -----
 index.php - Example implementation of a web-based flight fare search engine 
