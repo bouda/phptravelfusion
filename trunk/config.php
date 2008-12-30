@@ -24,4 +24,4 @@ $tfconfig[TFPASS] = ""; //The english-ish password used to login to the web-base
 //       login request to their server using the above credentials.  However, it is the only key
 //       that you need to use the XML services, so you only need to get this once, and place it below.
 $tfconfig[TFXMLLOGIN] = "";  // 16 character XML key
-?>         
+?>

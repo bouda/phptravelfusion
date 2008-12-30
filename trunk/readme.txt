@@ -19,11 +19,17 @@ v0.1    - Initial release, minimal but functional for only flight searches.
 
 Change Log
 ----------
-v0.1.02 * Added round-trip pricing to getSimplePricing() if route is priced in 
-          segments.
+v0.1.02 * Added total round-trip pricing to getSimplePricing() if route is 
+          priced in segments.
         * Added convertCurrency() method, which uses rates from the xavier.com 
           conversion API
-                   
+        * Disabled search button if config file does not have any values.
+        * Added getCheapestRoute() method, which returns a single cheapest
+          route.
+        * Added caching to the convertCurrency() method, so it is not called
+          every time a price is needed, but rather only once per object
+          instantiation.
+                                                             
 v0.1.01 * Fixed date translation (mm/dd vs dd/mm) issue
         * New method to return a simplified list of fares 
         * Fixed problem where search was returning one-way flights only
