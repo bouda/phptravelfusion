@@ -261,6 +261,31 @@ class phpTravelFusion {
       return round($amount_in_to,2);
       }
 
+  function getAirportByIATA($IATA)
+      {
+      $airports = file("airports.txt");
+      for ($i=0;$i<sizeof($airports);$i++)
+            {
+            $fields = explode(":",trim($airports[$i]));
+            if ($fields[1] == $IATA)
+                {
+                return $fields[3];
+                }
+            }
+      }
+
+  function getCountryByIATA($IATA)
+      {
+      $airports = file("airports.txt");
+      for ($i=0;$i<sizeof($airports);$i++)
+            {
+            $fields = explode(":",trim($airports[$i]));
+            if ($fields[1] == $IATA)
+                {
+                return $fields[4];
+                }
+            }
+      }
   function calcCoordinateDistance($from_airport,$to_airport)
       {
       $airports = file("airports.txt");
