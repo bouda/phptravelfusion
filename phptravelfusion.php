@@ -51,8 +51,11 @@ class phpTravelFusion {
                         <Radius>10000</Radius>
                     </Destination>
                     <OutwardDates>
-                        <DateOfSearch>$tleave-10:00</DateOfSearch>
+                        <DateOfSearch>$tleave-01:00</DateOfSearch>
                     </OutwardDates>
+                    <ReturnDates>
+                        <DateOfSearch>$treturn-05:00</DateOfSearch>
+                    </ReturnDates>
                     <MaxChanges>1</MaxChanges>
                     <MaxHops>2</MaxHops>
                     <Timeout>40</Timeout>
@@ -63,7 +66,7 @@ class phpTravelFusion {
                     </TravellerList>
                     <IncrementalResults>false</IncrementalResults>
                 </StartRouting>
-            </CommandList>";
+                </CommandList>";
       $xmlresults = $this->submitXML($xmldata,$tfconfig);      
       $results = substr($xmlresults,strpos($xmlresults,"<CommandList>"),10000000);           
       $p = xml_parser_create();
@@ -87,7 +90,7 @@ class phpTravelFusion {
                     <LoginId>$tfconfig[TFXMLLOGIN]</LoginId>
                     <RoutingId>$route</RoutingId>
                 </CheckRouting>
-            </CommandList>";
+                </CommandList>";
       $xmlresults = $this->submitXML($xmldata,$tfconfig);      
       $results = substr($xmlresults,strpos($xmlresults,"<CommandList>"),10000000);           
            
@@ -113,7 +116,7 @@ class phpTravelFusion {
                     <LoginId>$tfconfig[TFXMLLOGIN]</LoginId>
                     <RoutingId>$route</RoutingId>
                 </CheckRouting>
-            </CommandList>";
+                </CommandList>";
       
       $xmlresults = $this->submitXML($xmldata,$tfconfig);      
       $results = substr($xmlresults,strpos($xmlresults,"<CommandList>"),10000000);           
@@ -137,10 +140,18 @@ class phpTravelFusion {
               {
               if (sizeof($flightgroups[$j]) > 0)
                   {
+                  // One-way travel
+                  //$simplepricing[$i][route][$j][routeid] = $flightgroups[$j][id]; 
+                  //$outwardlist = $flightgroups[$j][outwardlist];
+                  //$simplepricing[$i][route][$j][price] = $outwardlist[0][outward][0][price][0][amount];
+                  //$simplepricing[$i][route][$j][currency] = $outwardlist[0][outward][0][price][0][currency];
+                  
+                  // Round Trip
                   $simplepricing[$i][route][$j][routeid] = $flightgroups[$j][id]; 
-                  $outwardlist = $flightgroups[$j][outwardlist];
-                  $simplepricing[$i][route][$j][price] = $outwardlist[0][outward][0][price][0][amount];
-                  $simplepricing[$i][route][$j][currency] = $outwardlist[0][outward][0][price][0][currency];                                          
+                  $outwardlist = $flightgroups[$j];
+                  $simplepricing[$i][route][$j][price] = $flightgroups[$j][price][0][amount];
+                  $simplepricing[$i][route][$j][currency] = $flightgroups[$j][price][0][currency];                                          
+                                                            
                   }
               }
           }
@@ -161,7 +172,7 @@ class phpTravelFusion {
       }
 
   // Converts XML into a PHP array      
-  function xml2array($data)
+  private function xml2array($data)
       {
       $p = xml_parser_create();
       xml_parser_set_option($p, XML_OPTION_SKIP_WHITE, 1);
@@ -174,7 +185,7 @@ class phpTravelFusion {
       }
       
    // A recursive function called by xml2array
-   function GetChildren($vals, &$i)
+   private function GetChildren($vals, &$i)
       {
       $children = array();
       if ($vals[$i]['value']) array_push($children, $vals[$i]['value']);      

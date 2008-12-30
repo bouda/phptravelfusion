@@ -36,6 +36,7 @@ if (strlen(trim($_GET[getroutes])) > 0)
     {    
     $tfapi = new phpTravelFusion();
     $routes = $tfapi->getRoutes($_GET[getroutes],$tfconfig);
+    //print_r($routes);
     $simplepricing = $tfapi->getSimplePricing($routes);
     
     echo "<table border=1>";
@@ -219,10 +220,10 @@ echo "From Airport Code<br>";
 echo "<input type='text' id='from' value='DTW'><br>"; 
 echo "Destination Airport Code<br>";
 echo "<input type='text' id='to' value='SCL'><br>";
-echo "Leave Date<br>";
-echo "<input type='text' id='tleave' value='". date("m/d/y",time() + 604800) ."'><br>";
-echo "Return Date<br>";
-echo "<input type='text' id='treturn' value='". date("m/d/y",time() + 1604800) ."'><br><br>";
+echo "Leave Date (DD/MM/YY)<br>";
+echo "<input type='text' id='tleave' value='". date("d/m/y",time() + 604800) ."'><br>";
+echo "Return Date (DD/MM/YY)<br>";
+echo "<input type='text' id='treturn' value='". date("d/m/y",time() + 1604800) ."'><br><br>";
 echo "<button onClick='javascript:doSearch()'>Search Fares</button>";
 echo "<input type='hidden' id='done'>"; 
 echo "<input type='hidden' id='todo'>";
