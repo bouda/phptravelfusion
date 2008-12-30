@@ -9,6 +9,7 @@
  *****************************/
 require_once("phptravelfusion.php");
 require_once("config.php");
+//error_reporting(E_ALL);
 
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Cache-Control: no-store, no-cache, must-revalidate');
@@ -36,32 +37,31 @@ if (strlen(trim($_GET[getroutes])) > 0)
     {    
     $tfapi = new phpTravelFusion();
     $routes = $tfapi->getRoutes($_GET[getroutes],$tfconfig);
-    //print_r($routes);
-    $simplepricing = $tfapi->getSimplePricing($routes);
-    
+    $simplepricingret = $tfapi->getSimplePricing($routes);
+        
     echo "<table border=1>";
-    for ($i=0;$i<sizeof($simplepricing);$i++)
+    for ($i=0;$i<sizeof($simplepricingret);$i++)
         {
         echo "<tr>";
         echo "<td>";
-        echo "<a href='". $simplepricing[$i][url] ."'>" . $simplepricing[$i][vendor] . "</a>";        
+        echo "<a href='". $simplepricingret[$i][url] ."'>" . $simplepricingret[$i][vendor] . "</a>";        
         echo "</td>";
         echo "<td>";
-        for ($j=0;$j<sizeof($simplepricing[$i][route]);$j++)
+        for ($j=0;$j<sizeof($simplepricingret[$i][route]);$j++)
             {
             echo "<table border=1>";
             echo "<tr>";
             echo "<td>";
-            echo $simplepricing[$i][route][$j][routeid];
+            echo $simplepricingret[$i][route][$j][routeid];
             echo "</td>";
             echo "<td>";
-            if ($simplepricing[$i][route][$j][currency] != 'USD')
+            if ($simplepricingret[$i][route][$j][currency] != 'USD')
                   {
-                  echo $tfapi->convertCurrency($simplepricing[$i][route][$j][price],$simplepricing[$i][route][$j][currency],'USD') . " USD (" . $simplepricing[$i][route][$j][price] . " " . $simplepricing[$i][route][$j][currency] . ")";
+                  echo $tfapi->convertCurrency($simplepricingret[$i][route][$j][price],$simplepricingret[$i][route][$j][currency],'USD') . " USD (" . $simplepricingret[$i][route][$j][price] . " " . $simplepricingret[$i][route][$j][currency] . ")";
                   }
             else
                   {                  
-                  echo $simplepricing[$i][route][$j][price] . " " . $simplepricing[$i][route][$j][currency];
+                  echo $simplepricingret[$i][route][$j][price] . " " . $simplepricingret[$i][route][$j][currency];
                   }
             echo "</td>";
             echo "</tr>";
@@ -72,7 +72,7 @@ if (strlen(trim($_GET[getroutes])) > 0)
         }
     echo "</table>";
     
-    print_r($routes);                
+    //print_r($routes);                
     exit();    
     }
 echo "<head>";
@@ -128,7 +128,7 @@ function doSearch()
         }
     else
         {
-        document.getElementById('status').innerHTML = "Submitting Request..<br>";
+        document.getElementById('status').innerHTML = "Submitting request..<br>";
         url="?from=" + escape(from) + "&to=" + escape(to) + "&tleave=" + escape(tleave) + "&treturn=" + escape(treturn);
         xmlhttp.open("GET",url,true);
         xmlhttp.onreadystatechange=function()
@@ -145,18 +145,10 @@ function doSearch()
         }
     }
 
-function pausecomp(millis)
-{
-var date = new Date();
-var curDate = null;
-
-do { curDate = new Date(); }
-while(curDate-date < millis);
-} 
 // This function gets the status of the route query from the class, to see if we are done yet.
 function getStatus(route)
     {
-    document.getElementById('status').innerHTML += "Checking Status of Route Query...";
+    document.getElementById('status').innerHTML += "Checking status of route query...";
     url="?checkroute=" + escape(route);
     xmlhttp2.open("GET",url,true);
     xmlhttp2.onreadystatechange=function()
@@ -171,7 +163,7 @@ function getStatus(route)
             var todo = curstat[1] / 1;            
             if (done < todo)
                 {
-                setTimeout("getStatus(trim(xmlhttp.responseText))",2250);
+                setTimeout("getStatus(trim(xmlhttp.responseText))",10250);
                 }
             else
                 {

@@ -6,11 +6,14 @@ require_once("config.php");
 // Set the search criteria
 $from_airport_code = "DTW";
 $to_airport_code = "SCL";
-$leave_date = "03/04/09-10:00";
-$return_date = "04/04/09-10:00";
+$leave_date = "08/02/09";
+$return_date = "21/02/09";
 
 // Instantiate a new phpTravelFusion object
 $tfapi = new phpTravelFusion();
+
+echo "Route Airports: " . $from_airport_code . " -> " . $to_airport_code . "\n";
+echo "Route Schedule: " . $leave_date . " -> " . $return_date . "\n";
 
 // Get a routing ID for the search criteria
 $routeid = $tfapi->doStartRouting($from_airport_code,$to_airport_code,$leave_date,$return_date,'Plane',$tfconfig);
@@ -22,10 +25,13 @@ do  {
     $status_array = explode(":",$status);
     echo "Received " . $status_array[0] . " out of " . $status_array[1] . " total routes..\n";
     flush();
-    sleep(2);
+    sleep(10);
     } while ($status_array[0] < $status_array[1]);
 
 // Get the finished route resulsts w/ pricing
 $routes = $tfapi->getRoutes($routeid,$tfconfig);
-echo sizeof($routes);
+$simplepricing = $tfapi->getCheapestRoute($routes);
+
+echo $simplepricing[0][vendor] . " $" . $simplepricing[0][route][0][price]  . " " . $simplepricing[0][route][0][currency] . "\n";
+
 ?>

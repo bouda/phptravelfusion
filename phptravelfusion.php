@@ -7,8 +7,13 @@
  * 
  * All classes for this API
  *****************************/
-
 class phpTravelFusion {
+  // variables available to this class
+  
+  // Store cached versions of the xavier.com API results, so we don't have to query
+  // them every time. 
+  var $currency_cache = "";
+  var $currency_cache_date = 0;
 
   // Submits the passed $xmldata to the TravelFusion API and returns the response
   function submitXML($xmldata,$tfconfig) {
@@ -31,7 +36,6 @@ class phpTravelFusion {
     socket_close($socket);
     return $temp;      
     }
-
   // Generates the XML required for the TravelFusion API to return a routing ID
   function doStartRouting($from,$to,$tleave,$treturn,$mode='Plane',$tfconfig)
       {
@@ -51,10 +55,10 @@ class phpTravelFusion {
                         <Radius>10000</Radius>
                     </Destination>
                     <OutwardDates>
-                        <DateOfSearch>$tleave-01:00</DateOfSearch>
+                        <DateOfSearch>$tleave-00:01</DateOfSearch>
                     </OutwardDates>
                     <ReturnDates>
-                        <DateOfSearch>$treturn-05:00</DateOfSearch>
+                        <DateOfSearch>$treturn-00:01</DateOfSearch>
                     </ReturnDates>
                     <MaxChanges>1</MaxChanges>
                     <MaxHops>2</MaxHops>
@@ -181,12 +185,58 @@ class phpTravelFusion {
       return $simplepricing2;          
       }
 
+  function getCheapestRoute($routesxml)
+      {
+      $cheapest = 999999999;
+      //print_r($routesxml);
+      $simplepricing = $this->getSimplePricing($routesxml);
+      //print_r($simplepricing);      
+      for ($i=0;$i<sizeof($simplepricing);$i++)
+          {                  
+          for ($j=0;$j<sizeof($simplepricing[$i][route]);$j++)
+              {              
+              if ($simplepricing[$i][route][$j][currency] != 'USD')
+                  {                    
+                  $simplepricing[$i][route][$j][price] = $this->convertCurrency($simplepricing[$i][route][$j][price],$simplepricing[$i][route][$j][currency],'USD');
+                  $simplepricing[$i][route][$j][currency] = 'USD';
+                  }
+              //echo "current price: " . intval($simplepricing[$i][route][$j][price]) . "\n";
+              //echo "current cheapest: " . intval($cheapest) . "\n";                                                    
+              if ((intval($simplepricing[$i][route][$j][price]) < intval($cheapest)) && intval($simplepricing[$i][route][$j][price]) > 0)
+                  {                  
+                  //$cheapest_array = array();
+                  $cheapest = $simplepricing[$i][route][$j][price];
+                  $cheapestarr[0][url] = $simplepricing[$i][url]; 
+                  $cheapestarr[0][vendor] = $simplepricing[$i][vendor];
+                  $cheapestarr[0][route][0][routeid] = $simplepricing[$i][route][$j][routeid];
+                  $cheapestarr[0][route][0][currency] = $simplepricing[$i][route][$j][currency];
+                  $cheapestarr[0][route][0][price] = $simplepricing[$i][route][$j][price];
+                  }                    
+              }
+          }            
+      return $cheapestarr;      
+      }
+
   // Get currency exchange rates from Xavier exchange rate API:
   // http://api.finance.xaviermedia.com/api/latest.xml
   function convertCurrency($amount,$fromcurrency,$tocurrency)
       {
-      $rates = file_get_contents("http://api.finance.xaviermedia.com/api/latest.xml");
-      $rates = substr($rates,strpos($rates,"<xavierresponse"),10000000);           
+      global $currency_cache, $currency_cache_date;
+      // Only get new rates if we have not yet called the xavier API yet 
+      // or if it has been a *very* long time since this object was 
+      // instantiated.
+      if ($currency_cache_date < (time() - 86400))
+          {
+          $rates = file_get_contents("http://api.finance.xaviermedia.com/api/latest.xml");
+          $rates = substr($rates,strpos($rates,"<xavierresponse"),10000000);
+          $currency_cache = $rates;
+          $currency_cache_date = time();
+          }
+      else
+          {
+          $rates = $currency_cache;          
+          }          
+                 
       $raw_exchange_rates = $this->xml2array($rates);
       
       $rate_array = $raw_exchange_rates[exchange_rates][0][fx];
@@ -253,8 +303,6 @@ class phpTravelFusion {
                 return $children;
               }
           }
-      }
-                             
+      }                             
 }
-
-?>         
+?>
