@@ -29,6 +29,9 @@ v0.1.02 * Added total round-trip pricing to getSimplePricing() if route is
         * Added caching to the convertCurrency() method, so it is not called
           every time a price is needed, but rather only once per object
           instantiation.
+        * Increased time delay between checkRoute() requests.
+        * Add calcCoordinateDistance() method to give the line-of-sight mileage
+          between two different airport codes.                
                                                              
 v0.1.01 * Fixed date translation (mm/dd vs dd/mm) issue
         * New method to return a simplified list of fares 
