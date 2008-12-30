@@ -150,7 +150,17 @@ class phpTravelFusion {
                   $simplepricing[$i][route][$j][routeid] = $flightgroups[$j][id]; 
                   $outwardlist = $flightgroups[$j];
                   $simplepricing[$i][route][$j][price] = $flightgroups[$j][price][0][amount];
-                  $simplepricing[$i][route][$j][currency] = $flightgroups[$j][price][0][currency];                                          
+                  $simplepricing[$i][route][$j][currency] = $flightgroups[$j][price][0][currency];
+                  
+                  if (trim($simplepricing[$i][route][$j][price]) == "")
+                      {
+                      // This trip was possibly priced in multiple segments, let's add them up
+                      $outbound_price = $outwardlist[outwardlist][0][outward][0][price][0][amount];
+                      $return_price = $outwardlist[returnlist][0]["return"][0][price][0][amount];
+                      $currency = $outwardlist[outwardlist][0][outward][0][price][0][currency];                      
+                      $simplepricing[$i][route][$j][price] = $outbound_price + $return_price; 
+                      $simplepricing[$i][route][$j][currency] = $currency;
+                      }                                          
                                                             
                   }
               }
@@ -169,6 +179,36 @@ class phpTravelFusion {
           }
                 
       return $simplepricing2;          
+      }
+
+  // Get currency exchange rates from Xavier exchange rate API:
+  // http://api.finance.xaviermedia.com/api/latest.xml
+  function convertCurrency($amount,$fromcurrency,$tocurrency)
+      {
+      $rates = file_get_contents("http://api.finance.xaviermedia.com/api/latest.xml");
+      $rates = substr($rates,strpos($rates,"<xavierresponse"),10000000);           
+      $raw_exchange_rates = $this->xml2array($rates);
+      
+      $rate_array = $raw_exchange_rates[exchange_rates][0][fx];
+      for ($i=0;$i<sizeof($rate_array);$i++)
+            {
+            if ($fromcurrency == $rate_array[$i][currency_code])
+                {
+                $from_1_eur_rate = $rate_array[$i][rate];
+                }
+            if ($tocurrency == $rate_array[$i][currency_code])
+                {
+                $to_1_eur_rate = $rate_array[$i][rate];
+                }
+            }
+      //echo "1 euro = " . $from_1_eur_rate . " $fromcurrency\n";
+      //echo "1 euro = " . $to_1_eur_rate . " $tocurrency\n";
+      $amount_in_euros = ((100/$from_1_eur_rate) * $amount) / 100;                                        
+      //echo $amount . " " . $fromcurrency . " = " . $amount_in_euros  . " euro\n";
+      $amount_in_to = $amount_in_euros * $to_1_eur_rate;          
+      //echo $amount_in_euros . " euros = " . $amount_in_to  . " $tocurrency\n";
+            
+      return round($amount_in_to,2);
       }
 
   // Converts XML into a PHP array      

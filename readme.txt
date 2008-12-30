@@ -13,11 +13,17 @@ Requirements
 
 Releases
 --------
+v0.1.02 - Not yet released
 v0.1.01 - Major bug fixes (see Change Log)
 v0.1    - Initial release, minimal but functional for only flight searches.
 
 Change Log
 ----------
+v0.1.02 * Added round-trip pricing to getSimplePricing() if route is priced in 
+          segments.
+        * Added convertCurrency() method, which uses rates from the xavier.com 
+          conversion API
+                   
 v0.1.01 * Fixed date translation (mm/dd vs dd/mm) issue
         * New method to return a simplified list of fares 
         * Fixed problem where search was returning one-way flights only

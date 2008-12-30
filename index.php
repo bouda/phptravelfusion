@@ -55,7 +55,14 @@ if (strlen(trim($_GET[getroutes])) > 0)
             echo $simplepricing[$i][route][$j][routeid];
             echo "</td>";
             echo "<td>";
-            echo $simplepricing[$i][route][$j][price] . " " . $simplepricing[$i][route][$j][currency];
+            if ($simplepricing[$i][route][$j][currency] != 'USD')
+                  {
+                  echo $tfapi->convertCurrency($simplepricing[$i][route][$j][price],$simplepricing[$i][route][$j][currency],'USD') . " USD (" . $simplepricing[$i][route][$j][price] . " " . $simplepricing[$i][route][$j][currency] . ")";
+                  }
+            else
+                  {                  
+                  echo $simplepricing[$i][route][$j][price] . " " . $simplepricing[$i][route][$j][currency];
+                  }
             echo "</td>";
             echo "</tr>";
             echo "</table>";
@@ -63,7 +70,9 @@ if (strlen(trim($_GET[getroutes])) > 0)
         echo "</td>";
         echo "</tr>";
         }
-    echo "</table>";                
+    echo "</table>";
+    
+    print_r($routes);                
     exit();    
     }
 echo "<head>";
@@ -224,7 +233,15 @@ echo "Leave Date (DD/MM/YY)<br>";
 echo "<input type='text' id='tleave' value='". date("d/m/y",time() + 604800) ."'><br>";
 echo "Return Date (DD/MM/YY)<br>";
 echo "<input type='text' id='treturn' value='". date("d/m/y",time() + 1604800) ."'><br><br>";
-echo "<button onClick='javascript:doSearch()'>Search Fares</button>";
+if (strlen(trim($tfconfig[TFUSER])) == 0 || strlen(trim($tfconfig[TFPASS])) == 0 || strlen(trim($tfconfig[TFXMLLOGIN])) == 0 )
+    {
+    echo "<button disabled>Your config file is missing TravelFusion credentials</button>";
+    }
+else
+    {
+    echo "<button onClick='javascript:doSearch()'>Search Fares</button>";    
+    }     
+
 echo "<input type='hidden' id='done'>"; 
 echo "<input type='hidden' id='todo'>";
 echo "<hr><b>Status</b><br>";
